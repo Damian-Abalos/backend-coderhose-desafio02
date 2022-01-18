@@ -6,68 +6,77 @@ class Contenedor {
         this.productos = [];
     }
 
-    leerDirectorio(miCarpeta) {
-        const directorio = fs.readdirSync(miCarpeta);
-        console.log(directorio);
-    }
-
-    sobreescribir(nuevoTexto) {
-        fs.writeFileSync(this.nombreArchivo, nuevoTexto);
-    }
-
-    agregarContenido(nuevoContenido) {
-        fs.appendFileSync(this.nombreArchivo, nuevoContenido);
-    }
-
     save(nombreProducto, precio, ulrImagenProducto) {
-        let ultimoId = this.productos.length + 1;
+        
+        let ultimoId = this.productos.length + 1
+
         let nuevoProducto = {
             title: nombreProducto,
             price: precio,
             thumbnail: ulrImagenProducto,
-            id: ultimoId,
+            id: ultimoId
         };
+
+
         this.productos.push(nuevoProducto);
+
         let jsonProducts = JSON.stringify(this.productos);
-        fs.writeFileSync(this.nombreArchivo, jsonProducts);
+
+        try{
+            fs.writeFileSync(this.nombreArchivo, jsonProducts);
+            console.log(`producto creado con id:${nuevoProducto.id}`);
+        } catch (err) {
+            console.log(err)
+        } 
     }
 
     getById(id) {
-        let idProducto = this.productos.find((producto) => producto.id == id);
-        console.log(idProducto);
+        try {           
+            let idProducto = this.productos.find((producto) => producto.id == id) || null;
+            console.log(`producto con id ${id}:`);
+            console.log(idProducto);
+        } catch (err) {
+            console.log(err)
+        }
+        
     }
 
     getAll() {
-        fs.readFile(this.nombreArchivo, "utf-8", (err, res) => {
-            if (err) {
-                throw new Error(`error en lectura ${err}`);
-            }
-
+        try {
+            const file = fs.readFileSync(this.nombreArchivo, "utf-8")
             console.log("lectura exitosa");
 
-            const data = {
-                contenidoStr: res,
-                contenidoObj: JSON.parse(res)
-            };
+                const data = {
+                    contenidoStr: file,
+                    contenidoObj: JSON.parse(file)
+                };
 
-            console.log(data.contenidoObj);
-        });
-    }
-
-    deleteById(id) {
-        try {
-            this.productos.splice(id-1, 1);
-            console.log(`producto eliminado`);
-            let jsonProducts = JSON.stringify(this.productos);
-            fs.writeFileSync(this.nombreArchivo, jsonProducts);
-        
+                console.log(data.contenidoObj);            
         } catch (err) {
-            console.log(err);
+            console.log(err)
         }
     }
 
+    deleteById(id) {
+
+            this.productos.splice(id-1, 1);
+            let jsonProducts = JSON.stringify(this.productos);
+            try {
+                fs.writeFileSync(this.nombreArchivo, jsonProducts)
+                console.log(`producto con id ${id} eliminado`);
+            } catch (err) {
+                console.log(err)
+            }
+    }
+
     deleteAll() {
-        fs.unlinkSync(this.nombreArchivo);
+        try {
+            fs.unlinkSync(this.nombreArchivo);
+            console.log('archivo eliminado');
+        } catch (error) {
+            console.log(error);
+        }
+        
     }
 }
 
@@ -78,6 +87,8 @@ contenedor1.save("Calculadora",200,"https://cdn3.iconfinder.com/data/icons/educa
 contenedor1.save("Globo Terráqueo",200,"https://cdn3.iconfinder.com/data/icons/education-209/64/globe-earth-geograhy-planet-school-256.png");
 
 contenedor1.getAll();
-contenedor1.getById(1);
+contenedor1.getById(2);
+contenedor1.getById(4);
 contenedor1.deleteById(2);
 contenedor1.getAll();
+contenedor1.deleteAll();
