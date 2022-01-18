@@ -8,15 +8,23 @@ class Contenedor {
 
     save(nombreProducto, precio, ulrImagenProducto) {
         
-        let ultimoId = this.productos.length + 1
+
+        let ultimoId;
+
+        let ultimoProducto = this.productos[this.productos.length - 1];
+
+        if (this.productos.length == 0) {
+            ultimoId = 0
+        } else {
+            ultimoId = ultimoProducto.id 
+        }
 
         let nuevoProducto = {
             title: nombreProducto,
             price: precio,
             thumbnail: ulrImagenProducto,
-            id: ultimoId
-        };
-
+            id: ultimoId + 1
+        }
 
         this.productos.push(nuevoProducto);
 
@@ -45,13 +53,7 @@ class Contenedor {
         try {
             const file = fs.readFileSync(this.nombreArchivo, "utf-8")
             console.log("lectura exitosa");
-
-                const data = {
-                    contenidoStr: file,
-                    contenidoObj: JSON.parse(file)
-                };
-
-                console.log(data.contenidoObj);            
+            console.log(JSON.parse(file));            
         } catch (err) {
             console.log(err)
         }
@@ -90,5 +92,7 @@ contenedor1.getAll();
 contenedor1.getById(2);
 contenedor1.getById(4);
 contenedor1.deleteById(2);
+contenedor1.getAll();
+contenedor1.save("El último de prueba",200,"https://cdn3.iconfinder.com/data/icons/education-209/64/globe-earth-geograhy-planet-school-256.png");
 contenedor1.getAll();
 contenedor1.deleteAll();
